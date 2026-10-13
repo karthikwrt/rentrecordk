@@ -63,7 +63,7 @@ export default function DashboardScreen() {
       {active.length === 0 ? (
         <EmptyState
           title="No active tenancies"
-          message={`Add a property and a ${labels.person.toLowerCase()}, then link them in the Tenancy tab.`}
+          message={`Add a property and ${labels.aPerson}, then link them in the Tenancy tab.`}
         />
       ) : (
         active.map((t) => <TenancyCard key={t.id} tenancy={t} />)

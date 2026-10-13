@@ -68,6 +68,7 @@ export function useModeLabels() {
   return mode === 'owner'
     ? {
         person: 'Tenant',
+        aPerson: 'a tenant',
         people: 'Tenants',
         moneyIn: 'Collected',
         moneyVerb: 'collected',
@@ -75,6 +76,7 @@ export function useModeLabels() {
       }
     : {
         person: 'Owner',
+        aPerson: 'an owner',
         people: 'Owners',
         moneyIn: 'Paid',
         moneyVerb: 'paid',

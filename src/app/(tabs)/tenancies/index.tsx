@@ -20,7 +20,7 @@ export default function TenanciesScreen() {
       {tenancies.length === 0 ? (
         <EmptyState
           title="No tenancies yet"
-          message={`A tenancy links a property with a ${labels.person.toLowerCase()} and sets the rent. All rent ${labels.moneyVerb} is recorded here.`}
+          message={`A tenancy links a property with ${labels.aPerson} and sets the rent. All rent ${labels.moneyVerb} is recorded here.`}
         />
       ) : null}
       {active.length > 0 ? <SectionTitle>Active</SectionTitle> : null}

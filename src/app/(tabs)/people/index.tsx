@@ -18,7 +18,7 @@ export default function PeopleScreen() {
       {people.length === 0 ? (
         <EmptyState
           title={`No ${labels.people.toLowerCase()} yet`}
-          message={`Add a ${labels.person.toLowerCase()} so you can link them to a property.`}
+          message={`Add ${labels.aPerson} so you can link them to a property.`}
         />
       ) : (
         people.map((p) => (
