@@ -37,6 +37,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "dbe0477c-7833-43ff-8cf6-c0d4b22e37d2"
+      }
+    },
+    "owner": "karthikwrt"
   }
 }
