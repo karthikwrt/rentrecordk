@@ -6,9 +6,9 @@ import { Badge, Card } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import type { TenancyView } from '@/db/types';
 import { useTheme } from '@/hooks/use-theme';
-import { formatDate, toISODate } from '@/lib/dates';
+import { formatDate, fromISODate, toISODate } from '@/lib/dates';
 import { formatINR } from '@/lib/money';
-import { dueSchedule, type DueItem } from '@/lib/rent';
+import { dueSchedule, FREQUENCY_UNIT, periodStart, type DueItem } from '@/lib/rent';
 
 const PAGE = 30;
 
@@ -25,9 +25,11 @@ export function DueList({ tenancy }: { tenancy: TenancyView }) {
   const items = dueSchedule(tenancy);
 
   if (items.length === 0) {
+    const firstDue = toISODate(periodStart(fromISODate(tenancy.start_date), tenancy.frequency, 1));
     return (
       <ThemedText type="small" themeColor="textSecondary">
-        No rent due yet. The first rent is due on {formatDate(tenancy.start_date)}.
+        No rent due yet. The first {FREQUENCY_UNIT[tenancy.frequency]}&apos;s rent is due on{' '}
+        {formatDate(firstDue)}, once it is completed.
       </ThemedText>
     );
   }

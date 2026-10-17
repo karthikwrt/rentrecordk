@@ -190,7 +190,7 @@ function TenancyForm({
         onChange={(v) => update('frequency', v)}
       />
       <DateField
-        label="Start date (rent is due from this day)"
+        label="Start date (rent counts from this day)"
         value={form.start_date}
         onChange={(v) => update('start_date', v)}
       />

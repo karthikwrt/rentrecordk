@@ -26,8 +26,8 @@ export function periodStart(start: Date, frequency: Frequency, n: number) {
   }
 }
 
-/** Number of rent periods that have become due between `start` and `asOf` (both inclusive). */
-export function periodsDue(start: Date, asOf: Date, frequency: Frequency) {
+/** Number of rent periods that have started on or before `asOf`. */
+function periodsStarted(start: Date, asOf: Date, frequency: Frequency) {
   const days = daysBetween(start, asOf);
   if (days < 0) return 0;
   switch (frequency) {
@@ -38,11 +38,20 @@ export function periodsDue(start: Date, asOf: Date, frequency: Frequency) {
     case 'monthly': {
       let months =
         (asOf.getFullYear() - start.getFullYear()) * 12 + (asOf.getMonth() - start.getMonth());
-      // If this month's due date hasn't arrived yet, the current period isn't due.
+      // If this month's period hasn't started yet, don't count it.
       if (periodStart(start, 'monthly', months) > asOf) months -= 1;
       return months + 1;
     }
   }
+}
+
+/**
+ * Number of rent periods that have been fully completed before `asOf`.
+ * Rent is charged in arrears: a day/week/month becomes due once it has ended,
+ * i.e. on the day the next period starts.
+ */
+export function periodsDue(start: Date, asOf: Date, frequency: Frequency) {
+  return Math.max(0, periodsStarted(start, asOf, frequency) - 1);
 }
 
 export type DueStatus = 'paid' | 'partial' | 'unpaid';
@@ -50,9 +59,9 @@ export type DueStatus = 'paid' | 'partial' | 'unpaid';
 export type DueItem = {
   /** 0-based period number. */
   index: number;
-  /** First day of the period (rent is due on this day). */
+  /** First day of the period. */
   from: Date;
-  /** Last day of the period. */
+  /** Last day of the period; its rent becomes due the day after. */
   to: Date;
   amount: number;
   paid: number;
@@ -89,22 +98,27 @@ export type RentStatus = {
   paid: number;
   /** Positive = still owed, negative = paid in advance. */
   balance: number;
-  /** Next due date, or null if the tenancy has ended. */
+  /**
+   * Date the current period's rent becomes due (the day after it completes),
+   * or null if the tenancy has ended.
+   */
   nextDue: Date | null;
 };
 
 export function rentStatus(t: TenancyView, today = todayISO()): RentStatus {
   const start = fromISODate(t.start_date);
-  const endISO = t.end_date && t.end_date < today ? t.end_date : today;
-  const periods = periodsDue(start, fromISODate(endISO), t.frequency);
+  const ended = !t.active || (t.end_date !== null && t.end_date < today);
+  // The end date is the last day of the tenancy, so it counts as completed.
+  const asOf =
+    ended && t.end_date ? addDays(fromISODate(t.end_date), 1) : fromISODate(today);
+  const periods = periodsDue(start, asOf, t.frequency);
   const expected = periods * t.rent_amount;
   const paid = t.total_paid;
-  const ended = !t.active || (t.end_date !== null && t.end_date < today);
   return {
     periods,
     expected,
     paid,
     balance: expected - paid,
-    nextDue: ended ? null : periodStart(start, t.frequency, periods),
+    nextDue: ended ? null : periodStart(start, t.frequency, periods + 1),
   };
 }
