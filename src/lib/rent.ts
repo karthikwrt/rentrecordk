@@ -45,6 +45,44 @@ export function periodsDue(start: Date, asOf: Date, frequency: Frequency) {
   }
 }
 
+export type DueStatus = 'paid' | 'partial' | 'unpaid';
+
+export type DueItem = {
+  /** 0-based period number. */
+  index: number;
+  /** First day of the period (rent is due on this day). */
+  from: Date;
+  /** Last day of the period. */
+  to: Date;
+  amount: number;
+  paid: number;
+  status: DueStatus;
+};
+
+/**
+ * One row per rent period that has become due, newest first. Payments are
+ * applied to the oldest unpaid periods first.
+ */
+export function dueSchedule(t: TenancyView, today = todayISO()): DueItem[] {
+  const start = fromISODate(t.start_date);
+  const { periods } = rentStatus(t, today);
+  let remaining = t.total_paid;
+  const items: DueItem[] = [];
+  for (let i = 0; i < periods; i++) {
+    const paid = Math.min(t.rent_amount, Math.max(0, remaining));
+    remaining -= paid;
+    items.push({
+      index: i,
+      from: periodStart(start, t.frequency, i),
+      to: addDays(periodStart(start, t.frequency, i + 1), -1),
+      amount: t.rent_amount,
+      paid,
+      status: paid >= t.rent_amount ? 'paid' : paid > 0 ? 'partial' : 'unpaid',
+    });
+  }
+  return items.reverse();
+}
+
 export type RentStatus = {
   periods: number;
   expected: number;

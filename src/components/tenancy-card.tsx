@@ -30,8 +30,11 @@ export function TenancyCard({ tenancy }: { tenancy: TenancyView }) {
         </ThemedText>
         {tenancy.active ? <BalanceBadge tenancy={tenancy} /> : <Badge tone="neutral" label="Ended" />}
       </View>
+      <ThemedText type="default" numberOfLines={1}>
+        {tenancy.person_name}
+      </ThemedText>
       <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
-        {tenancy.person_name} · {formatINR(tenancy.rent_amount)} / {FREQUENCY_UNIT[tenancy.frequency]}
+        {formatINR(tenancy.rent_amount)} / {FREQUENCY_UNIT[tenancy.frequency]}
       </ThemedText>
       {status.nextDue ? (
         <ThemedText type="small" themeColor="textSecondary">

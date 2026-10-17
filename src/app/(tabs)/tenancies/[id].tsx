@@ -2,6 +2,7 @@ import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 
+import { DueList } from '@/components/due-list';
 import { BalanceBadge } from '@/components/tenancy-card';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, EmptyState, InfoRow, Loading, Screen, SectionTitle } from '@/components/ui';
@@ -10,7 +11,7 @@ import { deleteTenancy, getTenancy, listPayments, setTenancyActive } from '@/db/
 import { useTheme } from '@/hooks/use-theme';
 import { formatDate, todayISO, toISODate } from '@/lib/dates';
 import { formatINR } from '@/lib/money';
-import { FREQUENCY_LABEL, rentStatus } from '@/lib/rent';
+import { FREQUENCY_LABEL, FREQUENCY_UNIT, rentStatus } from '@/lib/rent';
 import { useAppState, useDbQuery, useModeLabels } from '@/state/app-state';
 
 export default function TenancyDetailScreen() {
@@ -163,6 +164,9 @@ export default function TenancyDetailScreen() {
         <InfoRow label="Deposit" value={formatINR(tenancy.deposit)} />
         {tenancy.notes ? <InfoRow label="Notes" value={tenancy.notes} /> : null}
       </Card>
+
+      <SectionTitle>{`Dues (every ${FREQUENCY_UNIT[tenancy.frequency]})`}</SectionTitle>
+      <DueList tenancy={tenancy} />
 
       <SectionTitle>{`Payments (${payments.length})`}</SectionTitle>
       {payments.length === 0 ? (
